@@ -84,6 +84,8 @@ class RandomLinkSplit(BaseTransform):
             split accordingly to prevent any data leakage.
             Can be :obj:`None` in case no reverse connection exists.
             (default: :obj:`None`)
+        seed (int, optional): The seed value to set for reproducible splits.
+            (default: None)
     """
     def __init__(
         self,
@@ -97,6 +99,7 @@ class RandomLinkSplit(BaseTransform):
         disjoint_train_ratio: Union[int, float] = 0.0,
         edge_types: Optional[Union[EdgeType, List[EdgeType]]] = None,
         rev_edge_types: Optional[Union[EdgeType, List[EdgeType]]] = None,
+        seed: Optional[int] = None,
     ):
         if isinstance(edge_types, list):
             if rev_edge_types is None:
@@ -115,11 +118,14 @@ class RandomLinkSplit(BaseTransform):
         self.disjoint_train_ratio = disjoint_train_ratio
         self.edge_types = edge_types
         self.rev_edge_types = rev_edge_types
+        self.seed = seed
 
     def __call__(
         self,
         data: Union[Data, HeteroData],
     ) -> Union[Data, HeteroData]:
+        if self.seed is not None:
+            torch.manual_seed(self.seed)
         edge_types = self.edge_types
         rev_edge_types = self.rev_edge_types
 
